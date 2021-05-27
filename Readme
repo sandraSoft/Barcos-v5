@@ -1,0 +1,49 @@
+PROYECTO BARCOS - v5
+Universidad de Caldas
+Ingeniería de Software
+2018 - 2021
+
+Proyecto usado como ejemplo de algunos conceptos de orientación a objetos.
+No es un proyecto completo, pues la idea es que los estudiantes, como ejercicio, 
+  realicen pruebas,adicionen validaciones y otras funcionalidades.
+
+Funcionalidad básica: en un puerto se tiene el registro de los barcos que llegan,
+ y, además de unos datos básicos, se desea conocer la capacidad de cada barco,
+ para poder obtener la capacidad total que maneja el puerto.
+ 
+*********** CAMBIOS con respecto a v4
+- Se separan las responsabilidades que tenía la clase "BaseDatosBarco", 
+  (para cumplir el principio de Single Responsibility), y se crean dos nuevas clases:
+  GestorConexionBd (encargada de abrir y cerrar la conexión a la base de datos) y
+  ConversorSql (encargada de crear las sentencias SQL para los objetos barco).
+- Se crea una clase "FabricaBarcos" que corresponde al patrón Factory,
+	para que cree los objetos Velero y Carguero, y así la clase Puerto
+	no tiene que conocer estas clases hijas al crear el barco, sino solo la clase padre.  
+
+*********** CAMBIOS con respecto a v3 
+- Se adicionan pruebas unitarias (y al gunas de integración) con JUnit. 
+	Para esto se crea un nuevo folder l lamado "test" con las clases de prueba.
+- Se hacen cambios en Velero y Carguero para que no retornen una capacidad negativa.
+- Se adiciona un constructor en la clase Puerto que recibe un repositorio 
+  (para facilitar las pruebas, enviando, por ejemplo, la lista y no la base de datos).
+
+*********** CAMBIOS con respecto a v2
+- Se adiciona una interfaz que ofrece los servicios para manejar la persistencia, y dos clases que la implementan.
+Se crea un nuevo paquete para esta interfaz y las clases:
+  Una para "simular" la persistencia con una lista en memoria
+  Una para acceso a base de datos (en este caso, SQLite)
+Cambian las clases de entidad porque se adicionan algunos métodos get que no tenían.
+Cambia la clase de control (para usar la interfaz).
+No cambia la interfaz gráfica.
+- Se adicionan como recursos adicionales para que funcione la base de datos:
+  El driver de conexión a SQLite. Se descarga el jar de: https://repo1.maven.org/maven2/org/xerial/sqlite-jdbc/
+  (la versión usada es la 3.34.0)
+  La base de datos, llamada "barcos.db", tiene la tabla "Barcos":
+   CREATE TABLE Barcos (matricula varchar(50) primary key, nacionalidad varchar(50),
+    volumen real, pasajeros integer, liquidos boolean, tipo varchar(20) not null);
+   
+*********** CAMBIOS con respecto a v1
+- Se crea una nueva excepción (BarcoException) para el manejo de los errores que tienen que ver la gestión de los barcos.
+No cambian las clases de entidad. Cambia la clase de control y la interfaz gráfica.
+
+
