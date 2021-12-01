@@ -1,8 +1,12 @@
 package puertos.control;
 
 import static org.junit.jupiter.api.Assertions.*;
+
+import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 
+import puertos.entidades.Carguero;
+import puertos.entidades.Velero;
 import puertos.persistencia.ListaBarcos;
 
 /**
@@ -11,17 +15,19 @@ import puertos.persistencia.ListaBarcos;
 class PuertoAdicionarBarcoTest {
 
 	/**
-	 * Se adicionan un velero y un carguero, con matrículas únicas
-	 * y volumen en el rango permitido
-	 * @throws BarcoException 
+	 * Se adiciona un barco con datos correctos, es decir:
+	 *   matrícula única y volumen en el rango permitido.
 	 */
 	@Test
 	void testAdicionarBarcosValidos() throws BarcoException {
 		Puerto puerto = new Puerto(new ListaBarcos());
-		boolean adicionVelero = puerto.adicionarBarco("Vel-001", "colombiana", 100, 'v', 8, false);
-		boolean adicionCarguero = puerto.adicionarBarco("Car-001", "peruana", 500, 'c', 15, true);
-		assertTrue(adicionVelero);
-		assertTrue(adicionCarguero);
+		JSONObject datosBarco = new JSONObject(
+				new Velero("123", "colombiana", 200, 10));
+		datosBarco.put("tipo","velero").put("liquidos",true);
+		
+		assertTrue(puerto.validarMatriculaUnica("123"));
+		puerto.adicionarBarco(datosBarco);
+		assertFalse(puerto.validarMatriculaUnica("123"));
 	}
 
 	/**
@@ -30,9 +36,15 @@ class PuertoAdicionarBarcoTest {
 	@Test
 	void testAdicionarBarcoRepetido() throws BarcoException {
 		Puerto puerto = new Puerto(new ListaBarcos());
-		puerto.adicionarBarco("Vel-002", "chilena", 50, 'v', 5, false);
-		boolean adicionRepetido = puerto.adicionarBarco("Vel-002", "chilena", 150, 'v', 15, false);
-		assertFalse(adicionRepetido);
+		JSONObject datosBarco = new JSONObject(
+				new Velero("245", "peruana", 100, 5));
+		datosBarco.put("tipo","velero").put("liquidos",false);
+		
+		assertTrue(puerto.validarMatriculaUnica("245"));
+		puerto.adicionarBarco(datosBarco);
+		assertFalse(puerto.validarMatriculaUnica("245"));
+		assertThrows(BarcoException.class,
+				() -> puerto.adicionarBarco(datosBarco));
 	}
 	
 	/**
@@ -41,8 +53,11 @@ class PuertoAdicionarBarcoTest {
 	@Test
 	void testAdicionarBarcoVolumenNegativo() {
 		Puerto puerto = new Puerto(new ListaBarcos());
+		JSONObject datosBarco = new JSONObject(
+				new Velero("789", "italiano", -79, 10));
+		datosBarco.put("tipo","velero").put("liquidos",true);
 		assertThrows(BarcoException.class,
-				() ->  puerto.adicionarBarco("Car-002", "mexicano", -250, 'c', 25, false));
+				() ->  puerto.adicionarBarco(datosBarco));
 	}
 	
 	/**
@@ -52,7 +67,10 @@ class PuertoAdicionarBarcoTest {
 	@Test
 	void testAdicionarBarcoVolumenAlto() {
 		Puerto puerto = new Puerto(new ListaBarcos());
+		JSONObject datosBarco = new JSONObject(
+				new Carguero("003", "canadiense", 1500, false));
+		datosBarco.put("tipo","carguero").put("pasajeros",30);
 		assertThrows(BarcoException.class,
-				() ->  puerto.adicionarBarco("Car-003", "canadiense", 1500, 'c', 30, true));
+				() ->  puerto.adicionarBarco(datosBarco));
 	}
 }

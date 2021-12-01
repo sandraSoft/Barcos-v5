@@ -2,15 +2,17 @@ package puertos.control;
 
 import java.util.List;
 
+import org.json.JSONObject;
+
 import puertos.entidades.Barco;
 import puertos.entidades.FabricaBarcos;
 import puertos.persistencia.RepositorioBarcos;
-
-import puertos.persistencia.BaseDatosBarcos;
+import puertos.persistencia.FabricaRepositorio;
 
 /**
  * Clase donde se registran los barcos que llegan al puerto,
  * y tiene la principales funciones del programa (es el control).
+ * 
  * @version 4.5
  */
 public class Puerto {
@@ -19,10 +21,7 @@ public class Puerto {
 	private final double VOLUMEN_MAXIMO = 1000;
 	
 	public Puerto() {
-		repositorio = new BaseDatosBarcos();
-		
-		/* También se puede tener lo siguiente:  */
-		// repositorioBarcos = new ListaBarcos();
+		repositorio = FabricaRepositorio.crearRepositorio("BaseDatos");
 	}
 	
 	public Puerto(RepositorioBarcos repositorio) {
@@ -44,39 +43,41 @@ public class Puerto {
 	}
 	
 	/**
-	 * Se adiciona un barco al puerto, es decir, se registra su información y se guarda.
-	 * @see puertos.entidades.FabricaBarcos#crearBarco(String, String, double, char, int, boolean)
-	 * @return	un valor booleano indicando si se pudo adicionar el barco
-	 * 			o no (porque ya existía otro con esa matrícula).
-	 * @throws BarcoException cuando algunos de las reglas del negocio no se cumple
+	 * Se adiciona un barco al puerto, es decir, 
+	 * se registra su información y se guarda.
+	 * @param datosBarco Objeto JSON con la información completa de un Barco.
+	 * @throws BarcoException cuando una regla del negocio no se cumple
+	 *  	(como el volumen permitido)
 	 */
-	public boolean adicionarBarco(String matricula, String nacionalidad, double volumen, 
-			char tipo, int pasajeros, boolean liquidos) throws BarcoException {
+	public void adicionarBarco(JSONObject datosBarco) throws BarcoException {
+		String matricula = datosBarco.getString("matricula");
+		double volumen = datosBarco.getDouble("volumen");
+		
+		if (!validarMatriculaUnica(matricula)) {
+			throw new BarcoException("No se puede guardar: "
+					+ "Ya existe un barco registrado con esa matrícula");
+		}
 		
 		if (!validarVolumenBarco(volumen)) {
-			throw new BarcoException("Volumen incorrecto: debe estar entre cero y mil [0 - 1000]");
+			throw new BarcoException("Volumen incorrecto: "
+					+ "debe estar entre cero y mil [0 - 1000]");
 		}
 		
-		// Aquí se pueden tener otras validaciones - REGLAS DEL NEGOCIO
-		
-		Barco barcoBuscado = buscarBarco(matricula);
-		
-		if (barcoBuscado == null) {
-			Barco barcoNuevo = FabricaBarcos.crearBarco(matricula, nacionalidad, volumen, tipo, pasajeros, liquidos);
-			if (barcoNuevo != null) {
-				return repositorio.adicionarBarco(barcoNuevo);
-			}
-		}
-		
-		return false;
+		Barco barco = FabricaBarcos.crearBarco(datosBarco);
+		repositorio.adicionarBarco(barco);
 	}
 
 	/**
-	 * Busca un barco entre los que están registrados, por su número de matrícula
-	 * @return el objeto barco con la matrícula dada, o null si no se encuentra
+	 * Valida que la matrícula no esté registrada en la lista de barcos.
+	 * @param matricula	la identificación del barco que se desea revisar
+	 * @return true si la matrícula es única, o false si ya existe 
 	 */
-	private Barco buscarBarco(String matricula) {
-		return repositorio.buscarBarco(matricula);
+	boolean validarMatriculaUnica(String matricula) {
+		Barco barco = repositorio.buscarBarco(matricula);
+		if (barco == null) {
+			return true;
+		}
+		return false;
 	}
 	
 	/**

@@ -12,13 +12,21 @@ Funcionalidad básica: en un puerto se tiene el registro de los barcos que llega
  para poder obtener la capacidad total que maneja el puerto.
  
 *********** CAMBIOS con respecto a v4
-- Se separan las responsabilidades que tenía la clase "BaseDatosBarco", 
-  (para cumplir el principio de Single Responsibility), y se crean dos nuevas clases:
-  GestorConexionBd (encargada de abrir y cerrar la conexión a la base de datos) y
-  ConversorSql (encargada de crear las sentencias SQL para los objetos barco).
+- Se cambia la lista de parámetros que recibe el método adicionarBarco,
+	de la clase Puerto, para recibir solo un JSON, cumpliendo así
+	el principio Open-Closed.
+	Para usar el objeto JSON se adiciona el jar: json-20210307.jar
+	(se puede descargar de: https://mvnrepository.com/artifact/org.json/json).
+	Esto también implica cambios en las clases:
+	 VentanaControlBarcos, PuertoCalcularCapacidadTest y PuertoAdicionarBarcoTest
 - Se crea una clase "FabricaBarcos" que corresponde al patrón Factory,
 	para que cree los objetos Velero y Carguero, y así la clase Puerto
-	no tiene que conocer estas clases hijas al crear el barco, sino solo la clase padre.  
+	no tiene que conocer estas clases hijas al crear el barco. 
+- Se crea una clase "FabricaRepositorio" (patrón Simple Factory),
+	para que la clase Puerto no tenga que conocer el repositorio concreto. 
+- Se separan algunas funcionalidades que hay en la clase "BaseDatosBarco", 
+  	para cumplir los principios DRY y Single Responsibility. 
+  	Para esto se crea la clase ConversorSQL.
 
 *********** CAMBIOS con respecto a v3 
 - Se adicionan pruebas unitarias (y al gunas de integración) con JUnit. 
@@ -36,7 +44,8 @@ Cambian las clases de entidad porque se adicionan algunos métodos get que no te
 Cambia la clase de control (para usar la interfaz).
 No cambia la interfaz gráfica.
 - Se adicionan como recursos adicionales para que funcione la base de datos:
-  El driver de conexión a SQLite. Se descarga el jar de: https://repo1.maven.org/maven2/org/xerial/sqlite-jdbc/
+  El driver de conexión a SQLite. 
+  Se descarga el jar de: https://repo1.maven.org/maven2/org/xerial/sqlite-jdbc/
   (la versión usada es la 3.34.0)
   La base de datos, llamada "barcos.db", tiene la tabla "Barcos":
    CREATE TABLE Barcos (matricula varchar(50) primary key, nacionalidad varchar(50),

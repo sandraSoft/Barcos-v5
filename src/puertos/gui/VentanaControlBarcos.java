@@ -5,6 +5,8 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
+import org.json.JSONObject;
+
 import puertos.control.BarcoException;
 import puertos.control.Puerto;
 
@@ -28,7 +30,8 @@ import javax.swing.ButtonModel;
  * Interfaz gráfica sencilla que permite hacer algunas operaciones
  * con barcos en un puerto, principalmente para pruebas.
  * Esta ventana se generó con el WindowsBuilder (plugin de Eclipse).
- * @version 1.5
+ * 
+ * @version 2.0
  */
 public class VentanaControlBarcos extends JFrame {
 	
@@ -277,24 +280,40 @@ public class VentanaControlBarcos extends JFrame {
 		String nacionalidad = campoNacionalidad.getText();
 		double volumen = Double.parseDouble(campoVolumen.getText());
 		ButtonModel botonSeleccionado = opcionesTipoBarco.getSelection();
-		char tipo = botonSeleccionado.getActionCommand().charAt(0);
+		String tipo = botonSeleccionado.getActionCommand();
 		int pasajeros = Integer.parseInt(campoPasajeros.getText());
 		boolean liquidos = checkLiquidos.isSelected();
 		
+		if (!validarCampoObligatorio(nacionalidad)) {
+			JOptionPane.showMessageDialog(this,
+					"Se debe ingresar algún dato en nacionalidad", 
+					"Error",JOptionPane.WARNING_MESSAGE);
+			return;
+		}
+		
+		JSONObject datosBarco = new JSONObject();
+		datosBarco.put("matricula", matricula);
+		datosBarco.put("nacionalidad", nacionalidad);
+		datosBarco.put("volumen", volumen);
+		datosBarco.put("tipo", tipo);
+		datosBarco.put("pasajeros", pasajeros);
+		datosBarco.put("liquidos", liquidos);
+		
 		try {
-			boolean pudoAdicionar = puerto.adicionarBarco(matricula, nacionalidad, volumen, tipo, pasajeros, liquidos);
-			if (pudoAdicionar) {
-				JOptionPane.showMessageDialog(this,"Barco registrado");
-			}
-			else {
-				JOptionPane.showMessageDialog(this,"Barco no registrado. Ya existe esa matrícula",
-						"Error en registro",JOptionPane.WARNING_MESSAGE);
-			}
+			puerto.adicionarBarco(datosBarco);
+			JOptionPane.showMessageDialog(this,"Barco registrado");
 		}
 		catch (BarcoException errorRegistro) {
 			JOptionPane.showMessageDialog(this,errorRegistro.getMessage(), 
 					"Error en registro",JOptionPane.WARNING_MESSAGE);
 		}
+	}
+	
+	private boolean validarCampoObligatorio(String valor) {
+		if (valor == null || valor.isBlank()) {
+			return false;
+		}
+		return true;
 	}
 	
 	/**

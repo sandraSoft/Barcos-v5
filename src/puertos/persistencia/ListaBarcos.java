@@ -7,6 +7,7 @@ import puertos.entidades.Barco;
 /**
  * Repositorio temporal que tiene la lista de barcos en memoria.
  * Generalmente usado para pruebas.
+ * 
  * @version 1.0
  */
 public class ListaBarcos implements RepositorioBarcos {

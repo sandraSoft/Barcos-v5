@@ -2,7 +2,11 @@ package puertos.control;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
+
+import puertos.entidades.Carguero;
+import puertos.entidades.Velero;
 import puertos.persistencia.ListaBarcos;
 
 /**
@@ -30,10 +34,24 @@ class PuertoCalcularCapacidadTest {
 	@Test
 	void testCalcularValido() throws BarcoException  {
 		Puerto puerto = new Puerto(new ListaBarcos());
-		puerto.adicionarBarco("Vel-001", "colombiana", 100, 'v', 8, false);
-		puerto.adicionarBarco("Vel-002", "chilena", 150, 'v', 15, false);
-		puerto.adicionarBarco("Car-001", "peruana", 500, 'c', 15, true);
-		puerto.adicionarBarco("Car-002", "mexicano", 250, 'c', 25, false);
+		
+		JSONObject datosVelero1 = new JSONObject(
+				new Velero("Vel-001", "colombiana", 100, 8));
+		datosVelero1.put("tipo","velero").put("liquidos",false);
+		JSONObject datosVelero2 = new JSONObject(
+				new Velero("Vel-002", "chilena", 150, 15));
+		datosVelero2.put("tipo","velero").put("liquidos",false);
+		JSONObject datosCarguero1 = new JSONObject(
+				new Carguero("Car-001", "peruana", 500, true));
+		datosCarguero1.put("tipo","carguero").put("pasajeros",12);
+		JSONObject datosCarguero2 = new JSONObject(
+				new Carguero("Car-002", "mexicano", 250, false));
+		datosCarguero2.put("tipo","carguero").put("pasajeros",12);
+		
+		puerto.adicionarBarco(datosVelero1);
+		puerto.adicionarBarco(datosVelero2);
+		puerto.adicionarBarco(datosCarguero1);
+		puerto.adicionarBarco(datosCarguero2);
 		double capacidadEsperada = 675;
 		double capacidad = puerto.calcularCapacidadTotal();
 		assertEquals(capacidadEsperada,capacidad);

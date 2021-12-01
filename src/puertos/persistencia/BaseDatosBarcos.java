@@ -1,6 +1,7 @@
 package puertos.persistencia;
 
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -21,71 +22,65 @@ import puertos.entidades.Barco;
  * @version 2.0
  */
 public class BaseDatosBarcos implements RepositorioBarcos {
-	
-	private GestorConexionBd gestorConexion;
-	private ConversorSqlBarcos conversorSql;
-	
+	String cadenaConexion;
+	private ConversorSql conversor;
+
 	public BaseDatosBarcos() {
-		this.gestorConexion = new GestorConexionBd();
-		this.conversorSql = new ConversorSqlBarcos();
+		conversor = new ConversorSql();
+		try {
+			DriverManager.registerDriver(new org.sqlite.JDBC());
+			cadenaConexion = "jdbc:sqlite:barcos.db";
+		} catch (SQLException e) {
+			System.err.println("Error de conexión con la base de datos: " + e);
+		}
 	}
-	
+
 	@Override
 	public List<Barco> consultarBarcos() {
 		List<Barco> barcos = new ArrayList<Barco>();
-		Connection conexion = null;
-		try {
-			conexion = gestorConexion.abrirConexion();
-			String consultaSQL = conversorSql.crearSentenciaSelectTodos();
+		try (Connection conexion = DriverManager.getConnection(cadenaConexion)) {
+			String consultaSQL = conversor.crearSentenciaSelectTodos();
 			PreparedStatement sentencia = conexion.prepareStatement(consultaSQL);
 			ResultSet resultadoConsulta = sentencia.executeQuery();
 			if (resultadoConsulta != null) {
 				while (resultadoConsulta.next()) {
-					Barco barco = conversorSql.instanciarBarco(resultadoConsulta);
+					Barco barco = conversor.crearObjetoBarco(resultadoConsulta);
 					barcos.add(barco);
 				}
 			}
 		} catch (SQLException e) {
 			System.err.println("Error con la base de datos en consultarBarcos: \n" + e);
-		} finally {
-			gestorConexion.cerrarConexion(conexion);
 		}
 		return barcos;
 	}
 
 	@Override
 	public boolean adicionarBarco(Barco barco) {
-		Connection conexion = null;
-		try {
-			conexion = gestorConexion.abrirConexion();
-			String sentenciaSQL = conversorSql.crearSentenciaInsert(barco);
+		try (Connection conexion = DriverManager.getConnection(cadenaConexion)) {
+			String sentenciaSQL = conversor.crearSentenciaSQL(barco);
 			Statement sentencia = conexion.createStatement();
 			int cantidadInserciones = sentencia.executeUpdate(sentenciaSQL);
 			return (cantidadInserciones > 0);
 		} catch (SQLException e) {
 			System.err.println("Error con la base de datos en adicionarBarco: \n" + e);
-		} finally {
-			gestorConexion.cerrarConexion(conexion);
 		}
 		return false;
 	}
 
+
 	@Override
 	public Barco buscarBarco(String matricula) {
-		Connection conexion = null;
-		try {
-			conexion = gestorConexion.abrirConexion();
-			String consultaSQL = conversorSql.crearSentenciaSelectUno();
+		try (Connection conexion = DriverManager.getConnection(cadenaConexion)) {
+			String consultaSQL = conversor.crearSentenciaSelectBarco();
 			PreparedStatement sentencia = conexion.prepareStatement(consultaSQL);
 			sentencia.setString(1, matricula);
-			ResultSet resultadoConsulta = sentencia.executeQuery();
-			if (resultadoConsulta != null && resultadoConsulta.next()) {
-				return conversorSql.instanciarBarco(resultadoConsulta);
+			ResultSet datosBarco = sentencia.executeQuery();
+			if (datosBarco != null && datosBarco.next()) {
+				Barco barco = conversor.crearObjetoBarco(datosBarco);
+				return barco;
 			}
 		} catch (SQLException e) {
 			System.err.println("Error con la base de datos en buscarBarco: \n" + e);
-		} finally {
-			gestorConexion.cerrarConexion(conexion);
 		}
 		return null;
 	}
