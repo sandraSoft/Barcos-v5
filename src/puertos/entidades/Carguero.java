@@ -3,7 +3,7 @@ package puertos.entidades;
 /**
  * Un barco que transporta carga entre puertos, tiene buena capacidad de carga.
  * 
- * @version 2.5
+ * @version 2.7
  */
 public class Carguero extends Barco {
 	private boolean liquidos;
@@ -12,7 +12,7 @@ public class Carguero extends Barco {
 	 * @see puertos.entidades.Barco#Barco(String, String, double)
 	 * @param liquidos	indicación de si puede llevar líquidos o no
 	 */
-	public Carguero(String matricula, String nacionalidad, double volumen,
+	Carguero(String matricula, String nacionalidad, double volumen,
 			boolean liquidos) {
 		super(matricula, nacionalidad, volumen);
 		this.liquidos = liquidos;

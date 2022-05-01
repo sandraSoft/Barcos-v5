@@ -4,7 +4,7 @@ import org.json.JSONObject;
 
 /**
  * Permite crear un barco de acuerdo con el tipo seleccionado
- * (que llega como uno de los valores del JSON que llega por parámetro),
+ * (es uno de los valores del JSON que llega por parámetro),
  * y así las clases que usan los barcos no tiene que conocer las hijas.
  * Corresponde al patrón de diseño "SIMPLE FACTORY".
  * 
@@ -14,11 +14,11 @@ public class FabricaBarcos {
 	
 	/**
 	 * Crea un objeto barco (una de las hijas: velero o carguero, por ejemplo).
+	 * 
 	 * @param datosBarco datos del barco en un objeto JSON
-	 * @return el objeto Barco creado, o null sino se especificó
-	 * 	un tipo válido
+	 * @return el objeto Barco creado, o null si no es un tipo válido
 	 */
-	public static Barco crearBarco(JSONObject datosBarco) {
+	public Barco crearBarco(JSONObject datosBarco) {
 		Barco barco = null;
 		
 		String matricula = datosBarco.getString("matricula");
