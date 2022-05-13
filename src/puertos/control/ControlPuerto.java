@@ -47,7 +47,9 @@ public class ControlPuerto {
 	 * Se adiciona un barco al puerto, es decir, se registra su información y se
 	 * guarda.
 	 * 
-	 * @param datosBarco Objeto JSON con la información completa de un Barco
+	 * @param datosBarco Objeto JSON con la información completa de un Barco:
+	 * 			matricula (String), nacionalidad (String), volumen (double),
+	 * 			tipo (char), pasajeros (int), liquidos (boolean). 
 	 * @throws BarcoException cuando alguna regla del negocio no se cumple
 	 */
 	public void adicionarBarco(JSONObject datosBarco) throws BarcoException {

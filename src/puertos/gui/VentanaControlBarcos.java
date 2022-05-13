@@ -28,7 +28,7 @@ import puertos.control.ControlPuerto;
  * con barcos en un puerto, principalmente para pruebas.
  * Esta ventana se generó con el WindowsBuilder (plugin de Eclipse).
  * 
- * @version 1.5
+ * @version 2.0
  */
 public class VentanaControlBarcos extends JFrame {
 	

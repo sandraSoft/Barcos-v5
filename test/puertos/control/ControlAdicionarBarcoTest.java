@@ -40,9 +40,9 @@ class ControlAdicionarBarcoTest {
 		
 		assertFalse(control.existeMatricula("245"));
 		control.adicionarBarco(datosVelero);
-		assertTrue(control.existeMatricula("245"));
+		assertTrue(control.existeMatricula("245"));   //primera vez que se adiciona
 		assertThrows(Exception.class, 
-				() -> control.adicionarBarco(datosVelero));
+				() -> control.adicionarBarco(datosVelero)); 	// segunda vez (repetido)
 	}
 	
 	/**
